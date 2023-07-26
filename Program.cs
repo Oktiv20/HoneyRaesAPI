@@ -135,14 +135,6 @@ app.MapGet("/servicetickets", () =>
 });
 
 
-app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
-{
-    serviceTicket.Id = serviceTickets.Max(st => st.Id) + 1;
-    serviceTickets.Add(serviceTicket);
-    return serviceTicket;
-});
-
-
 app.MapGet("/customers/{id}", (int id) =>
 {
     Customer customer = customers.FirstOrDefault(c => c.Id == id);
@@ -177,6 +169,21 @@ app.MapGet("/servicetickets/{id}", (int id) =>
     return Results.Ok(serviceTicket);
 });
 
+
+app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
+{
+    serviceTicket.Id = serviceTickets.Max(st => st.Id) + 1;
+    serviceTickets.Add(serviceTicket);
+    return serviceTicket;
+});
+
+
+app.MapDelete("/servicetickets/{id}", (int id) =>
+{
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    serviceTickets.Remove(serviceTicket);
+    return serviceTicket;
+};
 
 app.UseHttpsRedirection();
 
