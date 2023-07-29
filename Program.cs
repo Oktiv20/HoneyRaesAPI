@@ -60,7 +60,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = null,
         Description = "Issue with network connectivity",
         Emergency = false,
-        DateCompleted = DateTime.Now.AddDays(-3)
+        DateCompleted = null
     },
     new ServiceTicket()
     {
@@ -83,7 +83,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
     new ServiceTicket()
     {
         Id = 4,
-        CustomerId = 1,
+        CustomerId = null,
         EmployeeId = 1,
         Description = "Software installation",
         Emergency = false,
@@ -114,7 +114,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 
 app.MapGet("/customers", () =>
@@ -180,10 +179,35 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 
 app.MapDelete("/servicetickets/{id}", (int id) =>
 {
-    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(servticket => servticket.Id == id);
     serviceTickets.Remove(serviceTicket);
     return serviceTicket;
-};
+});
+
+
+app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
+{
+    ServiceTicket ticketToUpdate = serviceTickets.FirstOrDefault(servticket => servticket.Id == id);
+    int ticketIndex = serviceTickets.IndexOf(ticketToUpdate);
+    if (ticketToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    //the id in the request route doesn't match the id from the ticket in the request body. That's a bad request!
+    if (id != serviceTicket.Id)
+    {
+        return Results.BadRequest();
+    }
+    serviceTickets[ticketIndex] = serviceTicket;
+    return Results.Ok();
+});
+
+app.MapPost("/servicetickets/{id}/complete", (int id) =>
+{
+    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ticketToComplete.DateCompleted = DateTime.Now;
+});
+
 
 app.UseHttpsRedirection();
 
