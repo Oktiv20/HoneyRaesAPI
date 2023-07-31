@@ -60,7 +60,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = null,
         Description = "Issue with network connectivity",
         Emergency = false,
-        DateCompleted = null
+        DateCompleted = DateTime.Now
     },
     new ServiceTicket()
     {
@@ -78,12 +78,12 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Hardware replacement",
         Emergency = true,
-        DateCompleted = DateTime.Now.AddDays(-1)
+        DateCompleted = null
     },
     new ServiceTicket()
     {
         Id = 4,
-        CustomerId = null,
+        CustomerId = 2,
         EmployeeId = 1,
         Description = "Software installation",
         Emergency = false,
@@ -93,7 +93,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
     {
         Id = 5,
         CustomerId = 2,
-        EmployeeId = 3,
+        EmployeeId = null,
         Description = "Printer setup",
         Emergency = false,
         DateCompleted = DateTime.Now
@@ -202,10 +202,24 @@ app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
     return Results.Ok();
 });
 
+
 app.MapPost("/servicetickets/{id}/complete", (int id) =>
 {
-    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(servticket => servticket.Id == id);
     ticketToComplete.DateCompleted = DateTime.Now;
+});
+
+
+app.MapGet("/servicetickets/incompleteEmergencies", () =>
+{
+    List<ServiceTicket> incompleteEmergencies = serviceTickets.Where(servticket => !servticket.DateCompleted.HasValue && servticket.Emergency).ToList();
+    return Results.Ok(incompleteEmergencies);
+});
+
+app.MapGet("/servicetickets/unAssigned", () =>
+{
+    List<ServiceTicket> unassignedTicket = serviceTickets.Where(servticket => servticket.EmployeeId == null).ToList();
+    return Results.Ok(unassignedTicket);
 });
 
 
