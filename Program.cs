@@ -223,6 +223,8 @@ app.MapGet("/servicetickets/unAssigned", () =>
 });
 
 
+
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
