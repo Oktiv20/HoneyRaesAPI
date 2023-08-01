@@ -60,7 +60,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = null,
         Description = "Issue with network connectivity",
         Emergency = false,
-        DateCompleted = DateTime.Now
+        DateCompleted = DateTime.Now.AddYears(-1)
     },
     new ServiceTicket()
     {
@@ -69,7 +69,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 2,
         Description = "Server maintenance",
         Emergency = false,
-        DateCompleted = DateTime.Now.AddDays(-2)
+        DateCompleted = DateTime.Now.AddYears(-2)
     },
     new ServiceTicket()
     {
@@ -78,7 +78,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Hardware replacement",
         Emergency = true,
-        DateCompleted = null
+        DateCompleted = DateTime.Now
     },
     new ServiceTicket()
     {
@@ -87,7 +87,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Software installation",
         Emergency = false,
-        DateCompleted = null
+        DateCompleted = DateTime.Now
     },
     new ServiceTicket()
     {
@@ -216,6 +216,7 @@ app.MapGet("/servicetickets/incompleteEmergencies", () =>
     return Results.Ok(incompleteEmergencies);
 });
 
+
 app.MapGet("/servicetickets/unAssigned", () =>
 {
     List<ServiceTicket> unassignedTicket = serviceTickets.Where(servticket => servticket.EmployeeId == null).ToList();
@@ -223,6 +224,19 @@ app.MapGet("/servicetickets/unAssigned", () =>
 });
 
 
+app.MapGet("/servicetickets/inactiveCustomers", () =>
+{
+    DateTime oneYearAgo = DateTime.Now.AddYears(-1);
+
+    List<Customer> oldCustomers = customers.Where(customer =>
+    {
+        bool hasActiveTicket = serviceTickets.Any(servticket => servticket.CustomerId == customer.Id && servticket.DateCompleted.HasValue && servticket.DateCompleted >= oneYearAgo);
+        return !hasActiveTicket;
+    }).ToList();
+
+    return Results.Ok(oldCustomers);
+
+});
 
 
 app.UseHttpsRedirection();
