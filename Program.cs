@@ -1,3 +1,6 @@
+using HoneyRaesAPI.Models;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // CUSTOMER LIST
@@ -252,6 +255,21 @@ app.MapGet("/employees/availableEmployees", () =>
             servticket.EmployeeId == employee.Id && servticket.DateCompleted == null)).ToList();
 
     return Results.Ok(availableEmployees);
+});
+
+
+app.MapGet("/employee/{id}/customers", (int id) =>
+{
+    var employee = employees.FirstOrDefault(employee => employee.Id == id);
+
+    if (employee == null)
+    {
+        return Results.NotFound();
+    }
+
+    var employeesCustomers = customers.Where(customer => serviceTickets.Any(servticket => servticket.CustomerId == customer.Id && servticket.EmployeeId == id));
+
+    return Results.Ok(employeesCustomers);
 });
 
 
