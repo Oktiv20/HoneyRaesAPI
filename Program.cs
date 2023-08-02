@@ -57,7 +57,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
     {
         Id = 1,
         CustomerId = 1,
-        EmployeeId = null,
+        EmployeeId = 2,
         Description = "Issue with network connectivity",
         Emergency = false,
         DateCompleted = DateTime.Now.AddYears(-1)
@@ -78,7 +78,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Hardware replacement",
         Emergency = true,
-        DateCompleted = DateTime.Now
+        DateCompleted = DateTime.Today.AddMonths(-1)
     },
     new ServiceTicket()
     {
@@ -87,16 +87,16 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Software installation",
         Emergency = false,
-        DateCompleted = DateTime.Now
+        DateCompleted = DateTime.Today.AddMonths(-5)
     },
     new ServiceTicket()
     {
         Id = 5,
         CustomerId = 2,
-        EmployeeId = null,
+        EmployeeId = 3,
         Description = "Printer setup",
         Emergency = false,
-        DateCompleted = DateTime.Now
+        DateCompleted = null
     },
 
 };
@@ -236,6 +236,22 @@ app.MapGet("/servicetickets/inactiveCustomers", () =>
 
     return Results.Ok(oldCustomers);
 
+});
+
+
+app.MapGet("/employees/availableEmployees", () =>
+{
+    //List<Employee> availableEmployees = employees.Where(employee =>
+    //        !serviceTickets.Any(servticket =>
+    //            servticket.EmployeeId == employee.Id && !servticket.DateCompleted.HasValue)).ToList();
+    //return Results.Ok(availableEmployees);
+
+
+    List<Employee> availableEmployees = employees.Where(employee =>
+        !serviceTickets.Any(servticket =>
+            servticket.EmployeeId == employee.Id && servticket.DateCompleted == null)).ToList();
+
+    return Results.Ok(availableEmployees);
 });
 
 
