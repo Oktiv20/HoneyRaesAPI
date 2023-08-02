@@ -1,5 +1,6 @@
 using HoneyRaesAPI.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // CUSTOMER LIST
@@ -241,6 +242,10 @@ app.MapGet("/servicetickets/inactiveCustomers", () =>
 
 app.MapGet("/employees/availableEmployees", () =>
 {
+
+    //WORKS BUT ISNT VERY READ FRIENDLY
+
+
     //List<Employee> availableEmployees = employees.Where(employee =>
     //        !serviceTickets.Any(servticket =>
     //            servticket.EmployeeId == employee.Id && !servticket.DateCompleted.HasValue)).ToList();
@@ -252,6 +257,21 @@ app.MapGet("/employees/availableEmployees", () =>
             servticket.EmployeeId == employee.Id && servticket.DateCompleted == null)).ToList();
 
     return Results.Ok(availableEmployees);
+});
+
+
+app.MapGet("/employee/{id}/customers", (int id) =>
+{
+    var employee = employees.FirstOrDefault(employee => employee.Id == id);
+
+    if (employee == null)
+    {
+        return Results.NotFound();
+    }
+
+    var employeesCustomers = customers.Where(customer => serviceTickets.Any(servticket => servticket.CustomerId == customer.Id && servticket.EmployeeId == id));
+
+    return Results.Ok(employeesCustomers);
 });
 
 
