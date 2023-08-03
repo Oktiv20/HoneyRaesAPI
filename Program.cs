@@ -274,6 +274,14 @@ app.MapGet("/employeeOfTheMonth", () =>
     return Results.Ok(employeeOfTheMonth);
 });
 
+app.MapGet("/completedTickets", () =>
+{
+    var completedTickets = serviceTickets.Where(servticket => servticket.DateCompleted.HasValue)
+        .OrderBy(servticket => servticket.DateCompleted.HasValue).ToList();
+
+    return Results.Ok(completedTickets);
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
