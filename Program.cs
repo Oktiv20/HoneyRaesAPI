@@ -242,16 +242,6 @@ app.MapGet("/servicetickets/inactiveCustomers", () =>
 
 app.MapGet("/employees/availableEmployees", () =>
 {
-
-    //WORKS BUT ISNT VERY READ FRIENDLY
-
-
-    //List<Employee> availableEmployees = employees.Where(employee =>
-    //        !serviceTickets.Any(servticket =>
-    //            servticket.EmployeeId == employee.Id && !servticket.DateCompleted.HasValue)).ToList();
-    //return Results.Ok(availableEmployees);
-
-
     List<Employee> availableEmployees = employees.Where(employee =>
         !serviceTickets.Any(servticket =>
             servticket.EmployeeId == employee.Id && servticket.DateCompleted == null)).ToList();
@@ -274,6 +264,15 @@ app.MapGet("/employee/{id}/customers", (int id) =>
     return Results.Ok(employeesCustomers);
 });
 
+
+app.MapGet("/employeeOfTheMonth", () =>
+{
+    var lastMonth = DateTime.Now.AddMonths(-1);
+
+    var employeeOfTheMonth = employees.OrderByDescending(employee => serviceTickets.Count(servticket => servticket.EmployeeId == employee.Id && servticket.DateCompleted >= lastMonth)).FirstOrDefault();
+
+    return Results.Ok(employeeOfTheMonth);
+});
 
 app.UseHttpsRedirection();
 
