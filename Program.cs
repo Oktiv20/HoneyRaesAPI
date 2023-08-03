@@ -60,17 +60,16 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         CustomerId = 1,
         EmployeeId = 2,
         Description = "Issue with network connectivity",
-        Emergency = false,
+        Emergency = true,
         DateCompleted = DateTime.Now.AddYears(-1)
     },
     new ServiceTicket()
     {
         Id = 2,
         CustomerId = 3,
-        EmployeeId = 2,
+        EmployeeId = null,
         Description = "Server maintenance",
-        Emergency = false,
-        DateCompleted = DateTime.Now.AddYears(-2)
+        Emergency = true
     },
     new ServiceTicket()
     {
@@ -79,13 +78,13 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         EmployeeId = 1,
         Description = "Hardware replacement",
         Emergency = true,
-        DateCompleted = DateTime.Today.AddMonths(-1)
+        DateCompleted = DateTime.Today
     },
     new ServiceTicket()
     {
         Id = 4,
         CustomerId = 2,
-        EmployeeId = 1,
+        EmployeeId = null,
         Description = "Software installation",
         Emergency = false,
         DateCompleted = DateTime.Today.AddMonths(-5)
@@ -96,8 +95,7 @@ List<ServiceTicket> serviceTickets = new List<ServiceTicket>
         CustomerId = 2,
         EmployeeId = 3,
         Description = "Printer setup",
-        Emergency = false,
-        DateCompleted = null
+        Emergency = true
     },
 
 };
@@ -274,12 +272,20 @@ app.MapGet("/employeeOfTheMonth", () =>
     return Results.Ok(employeeOfTheMonth);
 });
 
+
 app.MapGet("/completedTickets", () =>
 {
     var completedTickets = serviceTickets.Where(servticket => servticket.DateCompleted.HasValue)
         .OrderBy(servticket => servticket.DateCompleted.HasValue).ToList();
 
     return Results.Ok(completedTickets);
+});
+
+
+app.MapGet("/prioritizedTickets", () =>
+{
+    var prioritizedTickets = serviceTickets.Where(servticket => servticket.DateCompleted == null).OrderByDescending(servticket => servticket.Emergency).ThenBy(servticket => servticket.EmployeeId == 0).ToList();
+    return Results.Ok(prioritizedTickets);
 });
 
 app.UseHttpsRedirection();
